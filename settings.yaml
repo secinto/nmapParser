@@ -4,3 +4,5 @@ s2s_path: "S://"
 #Files
 dpux_clean_xml: "dpux_clean.xml"
 ports_xml: "ports.{project_name}.output.xml"
+host_mapping: "dpux_host_to_ip.xml"
+dpux: "dpux_host_to_ip.json"

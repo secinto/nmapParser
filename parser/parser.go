@@ -96,7 +96,6 @@ func (p *NmapParser) Parse() error {
 			WriteToFile(p.options.BaseFolder+"domains_with_ports.txt", hostEntries)
 
 		}
-
 	}
 	return nil
 }

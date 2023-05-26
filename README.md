@@ -15,6 +15,8 @@ Released under Apache License version 2.0 see LICENSE for more information
 Description
 ----
 nmapParser is a GO tool which parses NMAP output and creates JSON outputs for further processing.
+It also generates a host mapping file between hostnames and identified open ports for the associated
+IP address. This is useful for testing other ports than 80 and 443 for HTTP services.
 
 # Installation Instructions
 
@@ -30,7 +32,7 @@ go install
 or the following to directly install it from the command line:
 
 ```sh
-go install -v github.com/secinto/parser/cmd/parser@latest
+go install -v github.com/secinto/nmapParser/cmd/nmapParser@latest
 ```
 
 # Usage
@@ -44,7 +46,20 @@ This will display help for the tool. Here are all the switches it supports.
 
 ```console
 Usage:
-  ./nmapParser [flags]
+  nmapParser [flags]
 
 Flags:
-   -p                    project name which will be added as additional information to the data
+INPUT:
+   -p, -project string  project name for metadata addition
+   -sj, -serviceJSON    creates a service JSON file in the project folder
+   -hd, -http_domains   create additional combinations from ports for HTTP scanning
+
+DEBUG:
+   -silent         show only results in output
+   -version        show version of the project
+   -v              show verbose output
+   -nc, -no-color  disable colors in output
+
+CONFIG:
+   -config string  settings (Yaml) file location (default "/home/samareina/.config/nmapParser/settings.yaml")
+

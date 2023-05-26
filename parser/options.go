@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	defaultSettingsLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/parser/settings.yaml")
+	defaultSettingsLocation = filepath.Join(folderutil.HomeDirOrDefault("."), ".config/nmapParser/settings.yaml")
 )
 
 type Options struct {
