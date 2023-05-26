@@ -22,7 +22,7 @@ nmapParser is a GO tool which parses NMAP output and creates JSON outputs for fu
 
 ```sh
 git clone https://github.com/secinto/nmapParser.git
-cd nmapParser
+cd parser
 go build
 go install
 ```
@@ -30,13 +30,13 @@ go install
 or the following to directly install it from the command line:
 
 ```sh
-go install -v github.com/secinto/nmapParser/cmd/nmapParser@latest
+go install -v github.com/secinto/parser/cmd/parser@latest
 ```
 
 # Usage
 
 ```sh
-nmapParser -help
+parser -help
 ```
 
 This will display help for the tool. Here are all the switches it supports.

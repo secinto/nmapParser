@@ -2,14 +2,14 @@ package main
 
 import (
 	"github.com/projectdiscovery/gologger"
-	"github.com/secinto/nmapParser/nmapParser"
+	"github.com/secinto/nmapParser/parser"
 )
 
 func main() {
 	// Parse the command line flags and read config files
-	options := nmapParser.ParseOptions()
+	options := parser.ParseOptions()
 
-	newParser, err := nmapParser.NewParser(options)
+	newParser, err := parser.NewParser(options)
 	if err != nil {
 		gologger.Fatal().Msgf("Could not create differ: %s\n", err)
 	}
