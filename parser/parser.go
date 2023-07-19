@@ -71,7 +71,6 @@ func loadConfigFrom(location string) Config {
 			DPUXCleanXMLFile: "dpux_clean.xml",
 			PortsXMLFile:     "ports.{project_name}.output.xml",
 			HostMapping:      "dpux_host_to_ip.json",
-			DPUXOutput:       "dpux_host_to_ip.json",
 		}
 	}
 	return config
@@ -148,7 +147,7 @@ func (p *NmapParser) parsePorts() []Host {
 }
 
 func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
-	input := GetJSONDocumentFromFile(p.options.BaseFolder + "recon/" + appConfig.DPUXOutput)
+	input := GetJSONDocumentFromFile(p.options.BaseFolder + "recon/" + appConfig.HostMapping)
 	allIPEntries := GetAllRecordsForKey(input, "ip")
 	allIPHosts := make(map[string]Host)
 

@@ -11,7 +11,6 @@ type Config struct {
 	PortsXMLFile     string `yaml:"ports_xml,omitempty"`
 	HostMapping      string `yaml:"host_mapping,omitempty"`
 	DPUXCleanXMLFile string `yaml:"dpux_xml,omitempty"`
-	DPUXOutput       string `yaml:"dpux_hosts,omitempty"`
 }
 
 type Project struct {
