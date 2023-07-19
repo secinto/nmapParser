@@ -19,6 +19,7 @@ type Options struct {
 	Project      string
 	ServiceJSON  bool
 	HTTPDomains  bool
+	All          bool
 	BaseFolder   string
 	Silent       bool
 	Version      bool
@@ -37,6 +38,7 @@ func ParseOptions() *Options {
 		flagSet.StringVarP(&options.Project, "project", "p", "", "project name for metadata addition"),
 		flagSet.BoolVarP(&options.ServiceJSON, "serviceJSON", "sj", false, "creates a service JSON file in the project folder"),
 		flagSet.BoolVarP(&options.HTTPDomains, "http_domains", "hd", false, "create additional combinations from ports for HTTP scanning"),
+		flagSet.BoolVarP(&options.All, "all", "a", false, "create all combinations from ports and hosts"),
 	)
 
 	flagSet.CreateGroup("debug", "Debug",

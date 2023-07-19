@@ -10,8 +10,8 @@ type Config struct {
 	S2SPath          string `yaml:"s2s_path"`
 	PortsXMLFile     string `yaml:"ports_xml,omitempty"`
 	HostMapping      string `yaml:"host_mapping,omitempty"`
-	DPUXCleanXMLFile string `yaml:"dpux_clean_xml,omitempty"`
-	DPUXOutput       string `yaml:"dpux,omitempty"`
+	DPUXCleanXMLFile string `yaml:"dpux_xml,omitempty"`
+	DPUXOutput       string `yaml:"dpux_hosts,omitempty"`
 }
 
 type Project struct {

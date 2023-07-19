@@ -126,7 +126,7 @@ func getValuesFromEntriesMatchBoolean(document *jsonquery.Node, key string, quer
 	return result
 }
 
-func getAllNodesByContains(document *jsonquery.Node, key string, queryKey string, queryContains []string) []*jsonquery.Node {
+func getAllNodesByContains(document *jsonquery.Node, queryKey string, queryContains []string) []*jsonquery.Node {
 
 	var results []*jsonquery.Node
 

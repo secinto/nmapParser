@@ -13,7 +13,7 @@ var (
 	appConfig     Config
 	project       Project
 	excludedPorts = []int{21, 22, 25, 143, 110, 143, 465, 587, 993, 995}
-	includedPorts = []int{80, 280, 81, 591, 593, 445, 457, 832, 981, 1311, 1241,
+	includedPorts = []int{80, 81, 280, 443, 591, 593, 445, 457, 832, 981, 1311, 1241,
 		1342, 1433, 1434, 1443, 1521, 1944, 2301, 2080, 2443, 2480, 3000, 3080, 3128,
 		3306, 3443, 4000, 4001, 4002, 4080, 4100, 4443, 4567, 5000, 5080, 5104, 5200,
 		5432, 5443, 5800, 5801, 5802, 5800, 6080, 6346, 6347, 6443, 7001, 7002, 7021,
@@ -91,10 +91,14 @@ func (p *NmapParser) Parse() error {
 			WriteHostsToJSONFile(p.options.BaseFolder+"findings/service_test.json", allHostRecords)
 		}
 		if p.options.HTTPDomains {
-			log.Infof("Creating host name mapping including open ports for project %s", p.options.Project)
-			hostEntries := p.generateHostPortCombinations()
+			log.Infof("Creating host name mapping including possible open HTTP ports for project %s", p.options.Project)
+			hostEntries := p.generateHostPortCombinations(false)
+			WriteToFile(p.options.BaseFolder+"domains_with_http_ports.txt", hostEntries)
+		}
+		if p.options.All {
+			log.Infof("Creating host name mapping including all ports for project %s", p.options.Project)
+			hostEntries := p.generateHostPortCombinations(true)
 			WriteToFile(p.options.BaseFolder+"domains_with_ports.txt", hostEntries)
-
 		}
 	}
 	return nil
@@ -143,7 +147,7 @@ func (p *NmapParser) parsePorts() []Host {
 	return allHostRecords
 }
 
-func (p *NmapParser) generateHostPortCombinations() string {
+func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 	input := GetJSONDocumentFromFile(p.options.BaseFolder + "recon/" + appConfig.DPUXOutput)
 	allIPEntries := GetAllRecordsForKey(input, "ip")
 	allIPHosts := make(map[string]Host)
@@ -184,7 +188,7 @@ func (p *NmapParser) generateHostPortCombinations() string {
 	var hostEntries strings.Builder
 	for _, host := range allIPHosts {
 		for _, service := range host.Services {
-			if checkIfPortIsContained(service.Number, includedPorts) {
+			if checkIfPortIsContained(service.Number, includedPorts) || generateAll {
 				hostEntries.WriteString(host.Name + ":" + strconv.Itoa(service.Number) + "\n")
 				counter++
 				for _, additionalHost := range host.AssociatedNames {
@@ -197,13 +201,4 @@ func (p *NmapParser) generateHostPortCombinations() string {
 
 	log.Infof("Created %d mappings from %d initial domain names", counter, len(allIPEntries))
 	return hostEntries.String()
-	//input := GetJSONDocumentFromFile(p.options.BaseFolder + "recon/" + appConfig.HostMapping)
-	// First get all IP addresses and the associated host names for it.
-
-	// Get all identified open ports (either from ports or dpux_clean).
-
-	// Update IP addresses with hostnames obtained from dpux_clean
-
-	// Create for all associated hosts entries for the open ports of the IP
-
 }
