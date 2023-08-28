@@ -39,7 +39,6 @@ func (p *NmapParser) initialize(configLocation string) {
 		p.options.BaseFolder = p.options.BaseFolder + "/"
 	}
 	appConfig.PortsXMLFile = strings.Replace(appConfig.PortsXMLFile, "{project_name}", p.options.Project, -1)
-	//appConfig.DPUXOutput = strings.Replace(appConfig.DPUXOutput, "{project_name}", p.options.Project, -1)
 
 	project = Project{
 		Name: p.options.Project,
