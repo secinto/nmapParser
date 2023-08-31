@@ -7,10 +7,9 @@ type NmapParser struct {
 }
 
 type Config struct {
-	S2SPath          string `yaml:"s2s_path"`
-	PortsXMLFile     string `yaml:"ports_xml,omitempty"`
-	HostMapping      string `yaml:"host_mapping,omitempty"`
-	DPUXCleanXMLFile string `yaml:"dpux_xml,omitempty"`
+	S2SPath      string `yaml:"s2s_path"`
+	PortsXMLFile string `yaml:"ports_xml,omitempty"`
+	HostMapping  string `yaml:"host_mapping,omitempty"`
 }
 
 type Project struct {

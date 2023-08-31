@@ -66,10 +66,9 @@ func loadConfigFrom(location string) Config {
 
 	if &config == nil {
 		config = Config{
-			S2SPath:          "S://",
-			DPUXCleanXMLFile: "dpux_clean.xml",
-			PortsXMLFile:     "ports.{project_name}.output.xml",
-			HostMapping:      "dpux_host_to_ip.json",
+			S2SPath:      "S://",
+			PortsXMLFile: "ports.{project_name}.output.xml",
+			HostMapping:  "dpux_host_to_ip.json",
 		}
 	}
 	return config
@@ -83,11 +82,6 @@ func NewParser(options *Options) (*NmapParser, error) {
 
 func (p *NmapParser) Parse() error {
 	if p.options.Project != "" {
-		if p.options.ServiceJSON {
-			log.Infof("Parsing NMAP output for project %s", p.options.Project)
-			allHostRecords := p.parseDPUX()
-			WriteHostsToJSONFile(p.options.BaseFolder+"findings/service_test.json", allHostRecords)
-		}
 		if p.options.HTTPDomains {
 			log.Infof("Creating host name mapping including possible open HTTP ports for project %s", p.options.Project)
 			hostEntries := p.generateHostPortCombinations(false)
@@ -109,26 +103,8 @@ func (p *NmapParser) Parse() error {
 
 -------------------------------------------------------------------------------
 */
-func (p *NmapParser) parseDPUX() []Host {
-	input := GetXMLDocumentFromFile(p.options.BaseFolder + "nmap/" + appConfig.DPUXCleanXMLFile)
-	allHostRecords := GetAllHostEntries(input, "host")
-	if log.Level == logrus.InfoLevel {
-		if len(allHostRecords) >= 1 {
-			// Fine, we found at least one.
-			for _, hostNode := range allHostRecords {
-				if hostNode.Name != "" {
-					log.Infof("Found host with IP %s and name %s with %d services running", hostNode.IP, hostNode.Name, len(hostNode.Services))
-				} else {
-					log.Infof("Found host with IP %s with %d services running", hostNode.IP, len(hostNode.Services))
-				}
-			}
-		}
-	}
-	return allHostRecords
-}
-
-func (p *NmapParser) parsePorts() []Host {
-	input := GetXMLDocumentFromFile(p.options.BaseFolder + "recon/" + appConfig.PortsXMLFile)
+func (p *NmapParser) parseHosts(nmapFile string) []Host {
+	input := GetXMLDocumentFromFile(nmapFile)
 	allHostRecords := GetAllHostEntries(input, "host")
 	if log.Level == logrus.InfoLevel {
 		if len(allHostRecords) >= 1 {
@@ -174,7 +150,7 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 			}
 		}
 	}
-	allPortsRecords := p.parsePorts()
+	allPortsRecords := p.parseHosts(p.options.BaseFolder + "recon/" + appConfig.PortsXMLFile)
 
 	for _, ports := range allPortsRecords {
 		if existingHost, ok := allIPHosts[ports.IP]; ok {
