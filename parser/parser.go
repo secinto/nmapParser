@@ -131,21 +131,19 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 		for _, host := range allIPEntries {
 			hostIPEntries := getValuesFromNode(host, "ip")
 			hostNameEntries := getValuesFromNode(host, "host")
-			if len(hostIPEntries) >= 1 {
-				for _, hostEntry := range hostIPEntries {
-					if existingHost, ok := allIPHosts[hostEntry]; !ok {
-						// First entry should be created not from dpux but rather from dns resolution of nmap possibly
-						newHost := Host{
-							IP:              hostEntry,
-							Name:            hostNameEntries[0],
-							Services:        nil,
-							AssociatedNames: []string{},
-						}
-						allIPHosts[hostEntry] = newHost
-					} else {
-						existingHost.AssociatedNames = AppendIfMissing(existingHost.AssociatedNames, hostNameEntries[0])
-						allIPHosts[hostEntry] = existingHost
+			for _, hostEntry := range hostIPEntries {
+				if existingHost, ok := allIPHosts[hostEntry]; !ok {
+					// First entry should be created not from dpux but rather from dns resolution of nmap possibly
+					newHost := Host{
+						IP:              hostEntry,
+						Name:            hostNameEntries[0],
+						Services:        nil,
+						AssociatedNames: []string{},
 					}
+					allIPHosts[hostEntry] = newHost
+				} else {
+					existingHost.AssociatedNames = AppendIfMissing(existingHost.AssociatedNames, hostNameEntries[0])
+					allIPHosts[hostEntry] = existingHost
 				}
 			}
 		}
@@ -156,17 +154,19 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 		if existingHost, ok := allIPHosts[ports.IP]; ok {
 			existingHost.Services = ports.Services
 			allIPHosts[ports.IP] = existingHost
+		} else {
+			log.Debugf("No services found for host with IP %s", ports.IP)
 		}
 	}
 	var counter = 0
-	var hostEntries strings.Builder
+	var hostEntries []string
 	for _, host := range allIPHosts {
 		for _, service := range host.Services {
 			if checkIfPortIsContained(service.Number, includedPorts) || generateAll {
-				hostEntries.WriteString(host.Name + ":" + strconv.Itoa(service.Number) + "\n")
+				hostEntries = AppendIfMissing(hostEntries, host.Name+":"+strconv.Itoa(service.Number))
 				counter++
 				for _, additionalHost := range host.AssociatedNames {
-					hostEntries.WriteString(additionalHost + ":" + strconv.Itoa(service.Number) + "\n")
+					hostEntries = AppendIfMissing(hostEntries, additionalHost+":"+strconv.Itoa(service.Number))
 					counter++
 				}
 			}
@@ -174,5 +174,5 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 	}
 
 	log.Infof("Created %d mappings from %d initial domain names", counter, len(allIPEntries))
-	return hostEntries.String()
+	return strings.Join(hostEntries, "\n")
 }
