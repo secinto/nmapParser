@@ -1,13 +1,13 @@
 package parser
 
-const VERSION = "0.1"
+const VERSION = "0.2.1"
 
 type NmapParser struct {
 	options *Options
 }
 
 type Config struct {
-	S2SPath      string `yaml:"s2s_path"`
+	ProjectsPath string `yaml:"projects_path"`
 	PortsXMLFile string `yaml:"ports_xml,omitempty"`
 	HostMapping  string `yaml:"host_mapping,omitempty"`
 }
