@@ -32,7 +32,7 @@ func GetAllHostEntries(document *xmlquery.Node, key string) []Host {
 			host = getGeneralInfoForHost(hostElement)
 
 			if host.IP != "" {
-				services := getAllServiceForHost(hostElement)
+				services := getAllServiceForHost(hostElement, true)
 				if services != nil {
 					host.Services = services
 				}
@@ -64,7 +64,7 @@ func getGeneralInfoForHost(node *xmlquery.Node) Host {
 	return host
 }
 
-func getAllServiceForHost(node *xmlquery.Node) []Service {
+func getAllServiceForHost(node *xmlquery.Node, onlyOpen bool) []Service {
 	var services []Service
 	ports := getAllNodesForKey(node, "ports/port")
 	for _, port := range ports {
@@ -75,10 +75,14 @@ func getAllServiceForHost(node *xmlquery.Node) []Service {
 			service.Number, _ = strconv.Atoi(portNumber)
 			service.Protocol = portProtocol
 			service.State = getValueForQuery(port, "//state/@state")
+			if onlyOpen && service.State != "open" {
+				continue
+			}
 			service.Name = getValueForQuery(port, "//service/@name")
 			service.Product = getValueForQuery(port, "//service/@product")
 			service.Description = getValueForQuery(port, "//service/@extrainfo")
 			service.OS = getValueForQuery(port, "//service/@ostype")
+
 			services = append(services, service)
 		}
 	}
