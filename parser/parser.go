@@ -155,7 +155,7 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 			existingHost.Services = ports.Services
 			allIPHosts[ports.IP] = existingHost
 		} else {
-			log.Debugf("No services found for host with IP %s", ports.IP)
+			log.Info("No services found for host with IP %s", ports.IP)
 		}
 	}
 	var counter = 0
