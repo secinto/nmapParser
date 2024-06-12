@@ -2,30 +2,15 @@ package parser
 
 import (
 	"github.com/antchfx/xmlquery"
-	"os"
+	"secinto/checkfix_utils/utils"
 	"strconv"
-	"strings"
 )
-
-func GetXMLDocumentFromFile(filename string) *xmlquery.Node {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatalf("Reading JSON input file failed: %s %s", err.Error(), filename)
-	}
-	xmlReader := strings.NewReader(string(data))
-	input, err := xmlquery.Parse(xmlReader)
-	if err != nil {
-		log.Fatalf("Reading JSON input file failed: %s %s", err.Error(), filename)
-	}
-
-	return input
-}
 
 func GetAllHostEntries(document *xmlquery.Node, key string) []Host {
 	var hosts []Host
 	var host Host
 
-	hostRecords := getAllNodesForKey(document, key)
+	hostRecords := utils.GetAllXMLNodesForKey(document, key)
 	for _, hostElement := range hostRecords {
 		if hostElement != nil {
 
@@ -43,20 +28,10 @@ func GetAllHostEntries(document *xmlquery.Node, key string) []Host {
 	return hosts
 }
 
-func getAllNodesForKey(document *xmlquery.Node, key string) []*xmlquery.Node {
-	entries, error := xmlquery.QueryAll(document, "//"+key)
-
-	if error != nil {
-		log.Errorf("Querying XML error #%v ", error)
-	}
-
-	return entries
-}
-
 func getGeneralInfoForHost(node *xmlquery.Node) Host {
 	var host Host
-	ipAddress := getValueForQuery(node, "//address/@addr")
-	hostName := getValueForQuery(node, "//hostnames/@name")
+	ipAddress := utils.GetValueForQuery(node, "//address/@addr")
+	hostName := utils.GetValueForQuery(node, "//hostnames/hostname/@name")
 	if ipAddress != "" {
 		host.IP = ipAddress
 		host.Name = hostName
@@ -66,39 +41,25 @@ func getGeneralInfoForHost(node *xmlquery.Node) Host {
 
 func getAllServiceForHost(node *xmlquery.Node, onlyOpen bool) []Service {
 	var services []Service
-	ports := getAllNodesForKey(node, "ports/port")
+	ports := utils.GetAllXMLNodesForKey(node, "ports/port")
 	for _, port := range ports {
 		var service Service
-		portNumber := getValueForQuery(port, "//@portid")
-		portProtocol := getValueForQuery(node, "//@protocol")
+		portNumber := utils.GetValueForQuery(port, "//@portid")
+		portProtocol := utils.GetValueForQuery(node, "//@protocol")
 		if portNumber != "" && portProtocol != "" {
 			service.Number, _ = strconv.Atoi(portNumber)
 			service.Protocol = portProtocol
-			service.State = getValueForQuery(port, "//state/@state")
+			service.State = utils.GetValueForQuery(port, "//state/@state")
 			if onlyOpen && service.State != "open" {
 				continue
 			}
-			service.Name = getValueForQuery(port, "//service/@name")
-			service.Product = getValueForQuery(port, "//service/@product")
-			service.Description = getValueForQuery(port, "//service/@extrainfo")
-			service.OS = getValueForQuery(port, "//service/@ostype")
+			service.Name = utils.GetValueForQuery(port, "//service/@name")
+			service.Product = utils.GetValueForQuery(port, "//service/@product")
+			service.Description = utils.GetValueForQuery(port, "//service/@extrainfo")
+			service.OS = utils.GetValueForQuery(port, "//service/@ostype")
 
 			services = append(services, service)
 		}
 	}
 	return services
-}
-
-func getValueForQuery(node *xmlquery.Node, query string) string {
-	element, error := xmlquery.Query(node, query)
-
-	if error != nil {
-		log.Errorf("Querying XML error #%v ", error)
-	}
-	if element != nil {
-		if element.InnerText() != "" {
-			return element.InnerText()
-		}
-	}
-	return ""
 }
