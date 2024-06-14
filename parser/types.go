@@ -18,7 +18,7 @@ type Project struct {
 
 type Host struct {
 	IP              string    `json:"ip"`
-	Name            string    `json:"hostname""`
+	Name            string    `json:"hostname"`
 	Services        []Service `json:"services"`
 	AssociatedNames []string  `json:"associatedNames"`
 }

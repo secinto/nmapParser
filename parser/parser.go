@@ -17,7 +17,7 @@ var (
 	excludedPorts = []int{21, 22, 25, 143, 110, 143, 465, 587, 993, 995}
 	includedPorts = []int{80, 81, 280, 443, 591, 593, 445, 457, 832, 981, 1311, 1241,
 		1342, 1433, 1434, 1443, 1521, 1944, 2301, 2080, 2443, 2480, 3000, 3080, 3128,
-		3306, 3443, 4000, 4001, 4002, 4080, 4100, 4443, 4567, 5000, 5080, 5104, 5200,
+		3306, 3443, 4000, 4001, 4002, 4080, 4100, 4343, 4443, 4567, 5000, 5080, 5104, 5200,
 		5432, 5443, 5800, 5801, 5802, 5800, 6080, 6346, 6347, 6443, 7001, 7002, 7021,
 		7023, 7025, 7080, 7443, 7777, 8000, 8008, 8042, 8080, 8081, 8082, 8180, 8222,
 		8280, 8281, 8333, 8443, 8530, 8531, 8843, 8880, 8888, 8887, 9000, 9080, 9090, 9443, 10443,
@@ -156,9 +156,6 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 		if existingHost, ok := allIPHosts[ports.IP]; ok {
 			if len(existingHost.Services) == 0 && len(ports.Services) > 0 {
 				existingHost.Services = ports.Services
-			}
-			if ports.Name != "" {
-				existingHost.AssociatedNames = append(existingHost.AssociatedNames, ports.Name)
 			}
 			allIPHosts[ports.IP] = existingHost
 		} else {
