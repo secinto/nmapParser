@@ -2,7 +2,7 @@ package parser
 
 import (
 	"github.com/antchfx/xmlquery"
-	"secinto/checkfix_utils/utils"
+	utils "secinto/checkfix_utils"
 	"strconv"
 )
 

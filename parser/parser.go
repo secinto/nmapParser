@@ -5,7 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"os"
-	"secinto/checkfix_utils/utils"
+	utils "secinto/checkfix_utils"
 	"strconv"
 	"strings"
 )
