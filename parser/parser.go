@@ -2,11 +2,9 @@ package parser
 
 import (
 	"encoding/json"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"os"
 	utils "secinto/checkfix_utils"
-	"strconv"
 	"strings"
 )
 
@@ -69,7 +67,8 @@ func loadConfigFrom(location string) Config {
 	if &config == nil {
 		config = Config{
 			ProjectsPath: "/checkfix/projects",
-			PortsXMLFile: "ports.{project_name}.output.xml",
+			PortsXMLFile: "services.json",
+			ServicesFile: "services.json",
 			HostMapping:  "dpux_host_to_ip.json",
 		}
 	}
@@ -105,22 +104,14 @@ func (p *NmapParser) Parse() error {
 
 -------------------------------------------------------------------------------
 */
-func (p *NmapParser) parseHosts(nmapFile string) []Host {
-	input := utils.GetXMLDocumentFromFile(nmapFile)
-	allHostRecords := GetAllHostEntries(input, "host")
-	if log.Level == logrus.InfoLevel {
-		if len(allHostRecords) >= 1 {
-			// Fine, we found at least one.
-			for _, hostNode := range allHostRecords {
-				if hostNode.Name != "" {
-					log.Infof("Found host with IP %s and name %s with %d services running", hostNode.IP, hostNode.Name, len(hostNode.Services))
-				} else {
-					log.Infof("Found host with IP %s with %d services running", hostNode.IP, len(hostNode.Services))
-				}
-			}
-		}
+func (p *NmapParser) getServicesJSON() []Service {
+	var services []Service
+	servicesFile := p.options.BaseFolder + "findings/" + appConfig.ServicesFile
+	servicesFileString := utils.ReadFileToString(servicesFile)
+	if err := json.Unmarshal([]byte(servicesFileString), &services); err != nil {
+		log.Fatalf("Couldn't unmarshal file %s. Reason: %v", servicesFile, err)
 	}
-	return allHostRecords
+	return services
 }
 
 func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
@@ -139,7 +130,7 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 					newHost := Host{
 						IP:              hostEntry,
 						Name:            strings.ToLower(hostNameEntries[0]),
-						Services:        nil,
+						Ports:           nil,
 						AssociatedNames: []string{},
 					}
 					allIPHosts[hostEntry] = newHost
@@ -150,27 +141,33 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 			}
 		}
 	}
-	allHostEntries := p.parseHosts(p.options.BaseFolder + "recon/" + appConfig.PortsXMLFile)
 
-	for _, ports := range allHostEntries {
-		if existingHost, ok := allIPHosts[ports.IP]; ok {
-			if len(existingHost.Services) == 0 && len(ports.Services) > 0 {
-				existingHost.Services = ports.Services
+	//allHostEntries := p.parseHosts(p.options.BaseFolder + "recon/" + appConfig.PortsXMLFile)
+	servicesJSON := p.getServicesJSON()
+
+	for _, service := range servicesJSON {
+		if existingHost, ok := allIPHosts[service.IP]; ok {
+			testPort := Port{
+				Number:   service.Port,
+				Protocol: service.Protocol,
 			}
-			allIPHosts[ports.IP] = existingHost
+			if len(existingHost.Ports) == 0 || checkIfPortIsNotContained(testPort, existingHost.Ports) {
+				existingHost.Ports = append(existingHost.Ports, testPort)
+			}
+			allIPHosts[service.IP] = existingHost
 		} else {
-			log.Errorf("No services found for host with IP %s", ports.IP)
+			log.Errorf("No services found for host with IP %s", service.IP)
 		}
 	}
 	var counter = 0
 	var hostEntries []string
 	for _, host := range allIPHosts {
-		for _, service := range host.Services {
+		for _, service := range host.Ports {
 			if checkIfPortIsContained(service.Number, includedPorts) || generateAll {
-				hostEntries = utils.AppendIfMissing(hostEntries, host.Name+":"+strconv.Itoa(service.Number))
+				hostEntries = utils.AppendIfMissing(hostEntries, host.Name+":"+service.Number)
 				counter++
 				for _, additionalHost := range host.AssociatedNames {
-					hostEntries = utils.AppendIfMissing(hostEntries, additionalHost+":"+strconv.Itoa(service.Number))
+					hostEntries = utils.AppendIfMissing(hostEntries, additionalHost+":"+service.Number)
 					counter++
 				}
 			}
@@ -182,7 +179,7 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 	}
 	if generateAll {
 		data, _ := json.MarshalIndent(allHosts, "", " ")
-		utils.WriteToFile(p.options.BaseFolder+"findings/nmap_dpux.json", string(data))
+		utils.WriteToFile(p.options.BaseFolder+"findings/all_dpux.json", string(data))
 	}
 
 	log.Infof("Created %d mappings from %d initial domain names", counter, len(allIPEntries))

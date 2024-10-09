@@ -9,6 +9,7 @@ type NmapParser struct {
 type Config struct {
 	ProjectsPath string `yaml:"projects_path"`
 	PortsXMLFile string `yaml:"ports_xml,omitempty"`
+	ServicesFile string `yaml:"services_file,omitempty"`
 	HostMapping  string `yaml:"host_mapping,omitempty"`
 }
 
@@ -17,18 +18,20 @@ type Project struct {
 }
 
 type Host struct {
-	IP              string    `json:"ip"`
-	Name            string    `json:"hostname"`
-	Services        []Service `json:"services"`
-	AssociatedNames []string  `json:"associatedNames"`
+	IP              string   `json:"ip"`
+	Name            string   `json:"hostname"`
+	Ports           []Port   `json:"ports"`
+	AssociatedNames []string `json:"associatedNames"`
+}
+
+type Port struct {
+	Number   string `json:"port"`
+	Protocol string `json:"protocol"`
 }
 
 type Service struct {
-	Number      int    `json:"port"`
-	Protocol    string `json:"protocol"`
-	Name        string `json:"name"`
-	State       string `json:"state"`
-	Product     string `json:"product,omitempty"`
-	Description string `json:"description,omitempty"`
-	OS          string `json:"ostype,omitempty"`
+	IP       string `json:"ip"`
+	Port     string `json:"port"`
+	Protocol string `json:"protocol"`
+	Service  string `json:"service"`
 }
