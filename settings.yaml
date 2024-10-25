@@ -1,6 +1,14 @@
 ---
 #Project configuration
-s2s_path: "S://"
+projects_path: "/checkfix/projects"
 #Files
-ports_xml: "ports.{project_name}.output.xml"
+dpux: "dpux.{project_name}.output.json"
+dpux_xml: "dpux.xml"
+dpux_ip: "dpux_clean.txt"
 host_mapping: "dpux_host_to_ip.json"
+httpx_domains: "http_from.domains.output.json"
+httpx_ips: "http_from.ips.output.json"
+httpx_clean: "http_from.clean.output.json"
+ports_xml: "ports.{project_name}.output.xml"
+ports_simple: "unique_open_ports.json"
+services_file: "services.json"
