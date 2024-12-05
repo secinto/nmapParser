@@ -115,7 +115,7 @@ func (p *NmapParser) getServicesJSON() []Service {
 }
 
 func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
-	input := utils.GetJSONDocumentFromFile(p.options.BaseFolder + "recon/" + appConfig.HostMapping)
+	input := utils.GetJSONDocumentFromFile(p.options.BaseFolder+"recon/"+appConfig.HostMapping, true)
 	allIPEntries := utils.GetAllJSONNodesForKey(input, "ip")
 	allIPHosts := make(map[string]Host)
 
