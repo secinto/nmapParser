@@ -8,7 +8,6 @@ type NmapParser struct {
 
 type Config struct {
 	ProjectsPath string `yaml:"projects_path"`
-	PortsXMLFile string `yaml:"ports_xml,omitempty"`
 	ServicesFile string `yaml:"services_file,omitempty"`
 	HostMapping  string `yaml:"host_mapping,omitempty"`
 }

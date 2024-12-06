@@ -38,7 +38,6 @@ func (p *NmapParser) initialize(configLocation string) {
 	if !strings.HasSuffix(p.options.BaseFolder, "/") {
 		p.options.BaseFolder = p.options.BaseFolder + "/"
 	}
-	appConfig.PortsXMLFile = strings.Replace(appConfig.PortsXMLFile, "{project_name}", p.options.Project, -1)
 
 	project = Project{
 		Name: p.options.Project,
@@ -67,7 +66,6 @@ func loadConfigFrom(location string) Config {
 	if &config == nil {
 		config = Config{
 			ProjectsPath: "/checkfix/projects",
-			PortsXMLFile: "services.json",
 			ServicesFile: "services.json",
 			HostMapping:  "dpux_host_to_ip.json",
 		}
@@ -142,7 +140,6 @@ func (p *NmapParser) generateHostPortCombinations(generateAll bool) string {
 		}
 	}
 
-	//allHostEntries := p.parseHosts(p.options.BaseFolder + "recon/" + appConfig.PortsXMLFile)
 	servicesJSON := p.getServicesJSON()
 
 	for _, service := range servicesJSON {
